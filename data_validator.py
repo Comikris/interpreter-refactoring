@@ -3,6 +3,30 @@ import math
 from datetime import *
 
 class DataValidator():
+    def __init__(self):
+        self.data = None
+
+    def is_person_valid(self, person):
+        pass
+
+    def is_sex_valid(self, sex):
+        pass
+
+    def is_date_valid(self, date):
+        pass
+
+    def is_birthday_valid(self, birthday):
+        pass
+
+    def is_sales_valid(self, sales):
+        pass
+
+    def is_bmi_valid(self, bmi):
+        pass
+
+    def is_income_valid(self, income):
+        pass
+
     def validate(self, data):
         add_to = []
         feedback = ""
@@ -85,3 +109,6 @@ class DataValidator():
 
         print(feedback)
         return add_to
+
+    def set_data(self, data):
+        self.data = data
