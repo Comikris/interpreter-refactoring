@@ -53,6 +53,34 @@ class Graph:
         plt.title(graph.title)
         plt.show()
 
+    def append_sql(self, sql):
+        database = self.database
+        database.execute_sql(sql)
+        return database.cursor.fetchall()
+
+    def get_sex(self, sex):
+        formatted_sql = """SELECT * FROM employee WHERE gender = '{0}'""".format(
+            sex
+        )
+        return len(self.append_sql(formatted_sql))
+
+    def get_bmi(self, bmi):
+        formatted_sql = """SELECT * FROM employee WHERE BMI = '{0}'""".format(
+            bmi
+        )
+        return len(self.append_sql(formatted_sql))
+
+    def get_age_between(self, min, max):
+        formatted_sql = """SELECT * FROM employee WHERE age BETWEEN {0} AND {1}""".format(
+            min, max
+        )
+        return formatted_sql
+
+    def get_salary_by_between(self, field, val, min, max):
+        formatted_sql = """ELECT * FROM employee WHERE {0} = {1} AND Salary BETWEEN {2} AND {3}""".format(
+            field, val, min, max
+        )
+        return formatted_sql
     # Brendan Holt
     # Builds a graph, called from create_graph in the interpreter
     def build_graph(self, args):
@@ -78,10 +106,6 @@ class Graph:
         database = self.database
         new_graph = Graph(database)
 
-        # Nested Function to shorten code required to build graphdata
-        def append_sql(sql):
-            database.execute_sql(sql)
-            return database.cursor.fetchall()
         # Graph data is used to hold the values used in the graph regardless of type and options
         graphdata1 = []
         graphdata2 = []
@@ -92,76 +116,58 @@ class Graph:
         # The following called the database to build the graph
         if argss[0] == 'pie':
             if argss[1] == 'gender':
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE gender = 'm'""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE gender = 'f'""")))
+                graphdata1.append(self.get_sex('m'))
+                graphdata1.append(self.get_sex('f'))
                 labels = ['Male', 'Female']
                 graphtitle = "Employees by sex"
             elif argss[1] == 'bmi':
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE BMI = 'Underweight'""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE BMI = 'Normal'""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE BMI = 'Overweight'""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE BMI = 'Obesity'""")))
+                graphdata1.append(self.get_bmi('Underweight'))
+                graphdata1.append(self.get_bmi('Normal'))
+                graphdata1.append(self.get_bmi('Overweight'))
+                graphdata1.append(self.get_bmi('Obesity'))
                 labels = ['Underweight', 'Normal', 'Overweight', 'Obese']
                 graphtitle = "Employees by BMI"
             elif argss[1] == 'age':
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age < 25""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age BETWEEN 26 AND 40""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age BETWEEN 41 AND 50""")))
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age > 51""")))
+                graphdata1.append(self.get_age_between(0, 25))
+                graphdata1.append(self.get_age_between(26, 40))
+                graphdata1.append(self.get_age_between(41, 50))
+                graphdata1.append(self.get_age_between(51, 1000))
                 labels = ['Under 25', '25 to 40', '41 to 50', 'Over 51']
                 graphtitle = "Employees by Age"
         elif argss[0] == 'bar':
             if argss[1] == 'salary-by-gender':
-                graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE Gender = 'm' AND Salary<125""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'm' AND Salary BETWEEN 126 AND 150""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'm' AND Salary BETWEEN 151 AND 175""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'm' AND Salary BETWEEN 176 AND 200""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'f' AND Salary<125""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'f' AND Salary BETWEEN 126 AND 150""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'f' AND Salary BETWEEN 151 AND 175""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Gender = 'f' AND Salary BETWEEN 176 AND 200""")))
+                graphdata1.append(self.get_salary_by_between('gender', 'm', 0, 125))
+                graphdata1.append(self.get_salary_by_between('gender','m', 126, 150))
+                graphdata1.append(self.get_salary_by_between('gender','m', 151, 175))
+                graphdata1.append(self.get_salary_by_between('gender','m', 176, 200))
+
+                graphdata2.append(self.get_salary_by_between('gender','f', 0, 125))
+                graphdata2.append(self.get_salary_by_between('gender','f', 126, 150))
+                graphdata2.append(self.get_salary_by_between('gender','f', 151, 175))
+                graphdata2.append(self.get_salary_by_between('gender','f', 176, 200))
                 labels = ['<125K', '126-150K', '151-175K', '176-200K']
                 graphtitle = "Salaries by Gender"
             if argss[1] == 'salary-by-age':
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary<125""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 126 AND 150""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 151 AND 175""")))
-                graphdata1.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 176 AND 200""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary<125""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 126 AND 150""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 151 AND 175""")))
-                graphdata2.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 176 AND 200""")))
-                graphdata3.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary<125""")))
-                graphdata3.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 126 AND 150""")))
-                graphdata3.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 151 AND 175""")))
-                graphdata3.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 176 AND 200""")))
-                graphdata4.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary<125""")))
-                graphdata4.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 126 AND 150""")))
-                graphdata4.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 151 AND 175""")))
-                graphdata4.append(
-                    len(append_sql("""SELECT * FROM employee WHERE Age < 26 AND Salary BETWEEN 176 AND 200""")))
+                graphdata1.append(self.get_salary_by_between('age', 26, 0, 125))
+                graphdata1.append(self.get_salary_by_between('age', 26, 126, 150))
+                graphdata1.append(self.get_salary_by_between('age', 26, 151, 175))
+                graphdata1.append(self.get_salary_by_between('age', 26, 176, 200))
+
+                graphdata2.append(self.get_salary_by_between('age', 26, 0, 125))
+                graphdata2.append(self.get_salary_by_between('age', 26, 126, 150))
+                graphdata2.append(self.get_salary_by_between('age', 26, 151, 175))
+                graphdata2.append(self.get_salary_by_between('age', 26, 176, 200))
+
+                graphdata3.append(self.get_salary_by_between('age', 26, 0, 125))
+                graphdata3.append(self.get_salary_by_between('age', 26, 126, 150))
+                graphdata3.append(self.get_salary_by_between('age', 26, 151, 175))
+                graphdata3.append(self.get_salary_by_between('age', 26, 176, 200))
+
+                graphdata4.append(self.get_salary_by_between('age', 26, 0, 125))
+                graphdata4.append(self.get_salary_by_between('age', 26, 126, 150))
+                graphdata4.append(self.get_salary_by_between('age', 26, 151, 175))
+                graphdata4.append(self.get_salary_by_between('age', 26, 176, 200))
+
                 labels = ['<25', '26-40K', '40-50', '>50']
                 graphtitle = "Salaries by Age"
         # Sets the new graphs data
