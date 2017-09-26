@@ -3,12 +3,14 @@ from FileManagement.interface_filehandler import *
 import pickle
 import os
 import sys
+import data_validator
 from datetime import *
 
 # Kris Little design
 class FileHandler(IFileHandler):
     def __init__(self):
         self.valid = True
+        self.validator = data_validator.DataValidator()
 
     # Kris
     def load_file(self, file):
@@ -23,6 +25,7 @@ class FileHandler(IFileHandler):
                 line = tuple(line.replace('\n', "").split(','))
                 contents.append(line)
             the_file.close()
+            contents = self.validator.validate(contents)
             return contents
 
     # Kris
