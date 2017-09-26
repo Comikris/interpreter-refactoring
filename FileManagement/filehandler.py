@@ -25,7 +25,7 @@ class FileHandler(IFileHandler):
                 line = tuple(line.replace('\n', "").split(','))
                 contents.append(line)
             the_file.close()
-            contents = self.validator.validate(contents)
+            contents = self.validator.start(contents)
             return contents
 
     # Kris
