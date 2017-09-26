@@ -44,41 +44,6 @@ class FileHandler(IFileHandler):
         the_file.write(string)
         the_file.close()
 
-    # validate input for date type
-    # KATE
-    def valid_date(self, birthday):
-        minyear = 1000
-        maxyear = date.today().year
-
-        mydate = birthday.split('-')
-        if len(mydate) == 3:
-            birthdate = mydate[0]
-            birthmonth = mydate[1]
-            birthyear = mydate[2]
-            print(birthyear)
-
-            if int(birthyear) > maxyear or int(birthyear) < minyear:
-                print(mydate)
-                birthdayobj = date(birthdate, birthmonth, birthyear)
-                return True
-            else:
-                print('Year is out of range')
-
-    # Validate date match year
-    # KATE
-
-    def valid_age(self, birthday):
-        today = date.today()
-        mydate = birthday
-        print(mydate)
-        try:
-            born = datetime.strptime(mydate, '%d%m%Y')
-        except ValueError:
-            pass
-        else:
-            age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-            return age
-
     # Brendan Holt
     # Used to pickle the loaded graphs to default pickle file
     def pack_pickle(self, graphs):
